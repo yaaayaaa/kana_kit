@@ -56,7 +56,17 @@ String _katakanaToHiragana(
       // Transform long vowels: 'オー' to 'おう'.
     } else if (previousKana.isNotEmpty && isCharInnerLongDash(char, index)) {
       // Transform previousKana back to romaji, and slice off the vowel.
-      final romaji = toRomaji(previousKana).chars.last;
+      // A small tsu has no romaji mapping (`toRomaji('っ')` is an empty string,
+      // as asserted by the "small kana" tests), so `.chars.last` used to throw
+      // `Bad state: No element` for input like `ッー`. There is no vowel to turn
+      // the long dash into, which is exactly the case the fallback below
+      // ("'ー' is being used as a hyphen") already handles.
+      final romajiChars = toRomaji(previousKana).chars;
+      if (romajiChars.isEmpty) {
+        hiraChars.add('ー');
+        continue;
+      }
+      final romaji = romajiChars.last;
       // However, ensure 'オー' => 'おお' => 'oo' if this is a transform on the
       // way to romaji.
       if (_isCharKatakana(input[index - 1]) &&

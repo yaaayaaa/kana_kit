@@ -196,6 +196,18 @@ void main() {
         the(input: 'KEFUKOETE', shouldBecome: 'けふこえて');
         the(input: 'ASAKIYUMEMISHI', shouldBecome: 'あさきゆめみし');
         the(input: 'NLTU', shouldBecome: 'んっ');
+
+        // A long dash after a small tsu. `toRomaji('っ')` is an empty string,
+        // so these used to throw `Bad state: No element` (#29).
+        group('long dash after a small tsu', () {
+          the(input: 'ッー', shouldBecome: 'っー');
+          the(input: 'っッー', shouldBecome: 'っっー');
+          the(input: 'クッー', shouldBecome: 'くっー');
+          the(input: 'ッース', shouldBecome: 'っーす');
+          the(input: 'アッーカー', shouldBecome: 'あっーかあ');
+          the(input: 'ッ・ー', shouldBecome: 'っ・ー');
+          the(input: 'ッーーー', shouldBecome: 'っーーー');
+        });
       });
       group('(passRomaji: true)', () {
         final the = converterTest(
